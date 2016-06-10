@@ -1,4 +1,4 @@
-echo "Hello commit2"
+echo "Hello commit3"
 node {
   git 'https://github.com/amuniz/maven-helloworld.git'
   sh 'mvn clean compile' 
