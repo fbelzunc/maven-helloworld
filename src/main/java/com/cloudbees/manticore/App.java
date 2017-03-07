@@ -14,7 +14,7 @@ public class App
         // TODO: this is a task
         // FIXME: this is another task
         try {
-            a = "Hello"
+            a = "Hello" 
         } catch (Exception e) {}
     }
 }
