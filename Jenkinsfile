@@ -7,6 +7,7 @@ node('linux1') {
       sh "${mvnHome}/bin/mvn clean install -DskipTests"
       stash 'working-copy'
     } finally {
+        echo "notify_fixed_or_failed..."
         notify_fixed_or_failed();
     }
 
@@ -28,11 +29,12 @@ parallel one: {
 }, failFast: true
 
 
-
 def notify_fixed_or_failed(String recipients=null) {
   if (is_fixed()) {
+    echo "sending FIXED email"
     send_email('FIXED', recipients)
   } else if (get_status() == 'FAILURE') {
+    echo "sending FAILURE email"
     send_email('FAILURE', recipients)
   }
 }
