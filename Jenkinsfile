@@ -2,9 +2,14 @@ stage 'Compile'
 node('linux1') {
     checkout scm
     // use for non multibranch: git 'https://github.com/amuniz/maven-helloworld.git'
-    def mvnHome = tool 'maven-3'
-    sh "${mvnHome}/bin/mvn clean install -DskipTests"
-    stash 'working-copy'
+    try {
+      def mvnHome = tool 'maven-3'
+      sh "${mvnHome}/bin/mvn clean install -DskipTests"
+      stash 'working-copy'
+    } finally {
+        notify_fixed_or_failed();
+    }
+
 }
 
 stage 'Test'
@@ -22,11 +27,6 @@ parallel one: {
     }
 }, failFast: true
 
-stage 'Send Mail'
-
-node('linux1') {
-  notify_fixed_or_failed();
-}
 
 
 def notify_fixed_or_failed(String recipients=null) {
