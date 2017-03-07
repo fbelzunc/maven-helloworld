@@ -65,8 +65,10 @@ def send_email(String status=null, String recipients=null) {
 
 def is_fixed() {
     def status = get_status()
+    echo status
     return (status == 'SUCCESS' && !hudson.model.Result.SUCCESS.equals(currentBuild.rawBuild.getPreviousBuild()?.getResult()))
 }
 def get_status() {
+    echo currentBuild.result
     return currentBuild.result ?: 'SUCCESS'
 }
