@@ -34,6 +34,14 @@ $id$
     <build>
         <plugins>
             <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <source>1.6</source>
+                <target>1.6</target>
+              </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.16</version>
@@ -66,9 +74,9 @@ $id$
                 <executions>
                     <execution>
                         <id>run-findbugs</id>
-                        <phase>verify</phase> 
+                        <phase>verify</phase>
                         <goals>
-                            <goal>check</goal> 
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
