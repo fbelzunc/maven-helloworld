@@ -6,6 +6,9 @@ node('linux1') {
       def mvnHome = tool 'maven-3'
       sh "${mvnHome}/bin/mvn clean install -DskipTests"
       stash 'working-copy'
+    } catch(e) {
+      currentBuild.result = 'FAILURE'
+      throw e
     } finally {
         echo "notify_fixed_or_failed..."
         notify_fixed_or_failed();
