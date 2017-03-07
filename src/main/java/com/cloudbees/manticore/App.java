@@ -10,11 +10,11 @@ public class App
     {
         String a = null;
         System.out.println(a.toString());
-        System.out.println( "Hello World!" );
+        System.out.println( "Hello World!" )
         // TODO: this is a task
         // FIXME: this is another task
         try {
-            a = "Hello"
+            a = "Hello";
         } catch (Exception e) {}
     }
 }
