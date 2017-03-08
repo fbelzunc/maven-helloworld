@@ -52,6 +52,7 @@ def send_email(String status=null, String recipients=null) {
   <p>Check console output at "<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>
   """
 
+  currentBuild.result = null;
   if (recipients) {
     println "Email to recipients"
     emailext(subject: subject, body: details, to: recipients)
