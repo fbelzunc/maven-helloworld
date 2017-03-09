@@ -82,6 +82,7 @@ def is_fixed() {
     return (status == 'SUCCESS' && !hudson.model.Result.SUCCESS.equals(currentBuild.rawBuild.getPreviousBuild()?.getResult()))
 }
 def get_status() {
-    echo currentBuild.result
-    return currentBuild.result ?: 'SUCCESS'
+    def status = currentBuild.result ?: 'SUCCESS'
+    currentBuild.result = status
+    return status
 }
