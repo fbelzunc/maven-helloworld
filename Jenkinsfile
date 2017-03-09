@@ -2,16 +2,22 @@ stage 'Compile'
 node('linux1') {
     checkout scm
     // use for non multibranch: git 'https://github.com/amuniz/maven-helloworld.git'
+    println "CURRENT BUILD RESULT: " + currentBuild.result;
     try {
       def mvnHome = tool 'maven-3'
+      println "CURRENT BUILD RESULT: " + currentBuild.result;
       sh "${mvnHome}/bin/mvn clean install -DskipTests"
+      println "CURRENT BUILD RESULT: " + currentBuild.result;
       stash 'working-copy'
+      println "CURRENT BUILD RESULT: " + currentBuild.result;
     } catch(e) {
       currentBuild.result = 'FAILURE'
       throw e
     } finally {
+        println "CURRENT BUILD RESULT: " + currentBuild.result;
         echo "notify_fixed_or_failed..."
         notify_fixed_or_failed();
+        println "CURRENT BUILD RESULT: " + currentBuild.result;
     }
 
 }
@@ -33,6 +39,7 @@ parallel one: {
 
 
 def notify_fixed_or_failed(String recipients=null) {
+  println "CURRENT BUILD RESULT: " + currentBuild.result;
   if (is_fixed()) {
     echo "sending FIXED email"
     send_email('FIXED', recipients)
@@ -40,6 +47,7 @@ def notify_fixed_or_failed(String recipients=null) {
     echo "sending FAILURE email"
     send_email('FAILURE', recipients)
   }
+  println "CURRENT BUILD RESULT: " + currentBuild.result;
 }
 
 def send_email(String status=null, String recipients=null) {
@@ -52,6 +60,7 @@ def send_email(String status=null, String recipients=null) {
   <p>Check console output at "<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>
   """
 
+  println "CURRENT BUILD RESULT: " + currentBuild.result;
   currentBuild.result = "";
   if (recipients) {
     println "Email to recipients"
