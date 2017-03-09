@@ -3,7 +3,7 @@ node('linux1') {
     checkout scm
     // use for non multibranch: git 'https://github.com/amuniz/maven-helloworld.git'
     println "1 CURRENT BUILD RESULT: " + currentBuild.result;
-    out.println "1 CURRENT BUILD RESULT: " + currentBuild.result;
+    System.out.println "1 CURRENT BUILD RESULT: " + currentBuild.result;
     try {
       def mvnHome = tool 'maven-3'
       println "2 CURRENT BUILD RESULT: " + currentBuild.result;
