@@ -2,23 +2,22 @@ stage 'Compile'
 node('linux1') {
     checkout scm
     // use for non multibranch: git 'https://github.com/amuniz/maven-helloworld.git'
-    println "1 CURRENT BUILD RESULT: " + currentBuild.result;
     System.out.println "1 CURRENT BUILD RESULT: " + currentBuild.result;
     try {
       def mvnHome = tool 'maven-3'
-      println "2 CURRENT BUILD RESULT: " + currentBuild.result;
+      System.out.println "2 CURRENT BUILD RESULT: " + currentBuild.result;
       sh "${mvnHome}/bin/mvn clean install -DskipTests"
-      println "3 CURRENT BUILD RESULT: " + currentBuild.result;
+      System.out.println "3 CURRENT BUILD RESULT: " + currentBuild.result;
       stash 'working-copy'
-      println "4 CURRENT BUILD RESULT: " + currentBuild.result;
+      System.out.println "4 CURRENT BUILD RESULT: " + currentBuild.result;
     } catch(e) {
       currentBuild.result = 'FAILURE'
       throw e
     } finally {
-        println "5 CURRENT BUILD RESULT: " + currentBuild.result;
+        System.out.println "5 CURRENT BUILD RESULT: " + currentBuild.result;
         echo "notify_fixed_or_failed..."
         notify_fixed_or_failed();
-        println "6 CURRENT BUILD RESULT: " + currentBuild.result;
+        System.out.println "6 CURRENT BUILD RESULT: " + currentBuild.result;
     }
 
 }
@@ -40,7 +39,7 @@ parallel one: {
 
 
 def notify_fixed_or_failed(String recipients=null) {
-  println "CURRENT BUILD RESULT: " + currentBuild.result;
+  System.out.println "CURRENT BUILD RESULT: " + currentBuild.result;
   if (is_fixed()) {
     echo "sending FIXED email"
     send_email('FIXED', recipients)
@@ -48,7 +47,7 @@ def notify_fixed_or_failed(String recipients=null) {
     echo "sending FAILURE email"
     send_email('FAILURE', recipients)
   }
-  println "CURRENT BUILD RESULT: " + currentBuild.result;
+  System.out.println "CURRENT BUILD RESULT: " + currentBuild.result;
 }
 
 def send_email(String status=null, String recipients=null) {
@@ -61,9 +60,9 @@ def send_email(String status=null, String recipients=null) {
   <p>Check console output at "<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>
   """
 
-  println "[send_email] CURRENT BUILD RESULT: " + currentBuild.result;
+  System.out.println "[send_email] CURRENT BUILD RESULT: " + currentBuild.result;
   if (recipients) {
-    println "Email to recipients"
+    System.out.println "Email to recipients"
     emailext(subject: subject, body: details, to: recipients)
   } else {
     recipientsProvider = [
@@ -71,10 +70,10 @@ def send_email(String status=null, String recipients=null) {
       [$class: 'DevelopersRecipientProvider'],
       [$class: 'RequesterRecipientProvider']
     ]
-    println "Email to recipientsProvider"
+    System.out.println "Email to recipientsProvider"
     emailext(subject: subject, body: details, recipientProviders: recipientsProvider)
   }
-  println "[send_email] CURRENT BUILD RESULT: " + currentBuild.result;
+  System.out.println "[send_email] CURRENT BUILD RESULT: " + currentBuild.result;
 }
 
 def is_fixed() {
