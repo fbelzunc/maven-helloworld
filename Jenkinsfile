@@ -21,6 +21,7 @@ node('linux1') {
     }
 
     def changeLogSets = currentBuild.rawBuild.changeSets
+    echo "ChangeLogSets: " + changeLogSets
     for (int i = 0; i < changeLogSets.size(); i++) {
        def entries = changeLogSets[i].items
        for (int j = 0; j < entries.length; j++) {
