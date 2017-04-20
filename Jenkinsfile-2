@@ -1,0 +1,36 @@
+CLEAN_WORKSPACE = true
+node('win'){
+  ws("C://temp//workspace//test//"){
+    if (CLEAN_WORKSPACE){
+      stage 'Clean'
+      echo "Cleaning workspace: " + pwd()
+      deleteDir()
+    }
+
+    stage 'Checkout'
+    bat 'git config --list --show-origin'
+
+    checkout([
+      $class: 'GitSCM',
+      branches: scm.branches,
+      doGenerateSubmoduleConfigurations: false,
+      extensions: scm.extensions + [[
+        $class: 'SubmoduleOption',
+        disableSubmodules: false,
+        parentCredentials: true,
+        recursiveSubmodules: false,
+        reference: '',
+        trackingSubmodules: true
+        ]],
+      submoduleCfg: scm.submoduleCfg,
+      userRemoteConfigs: scm.userRemoteConfigs + [[
+        credentialsId: 'dariver-token',
+        url: 'https://github.com/dariver/maven-helloworld.git'
+      ]]
+    ])
+
+    bat 'git log -n 1'
+    bat 'git submodule summary HEAD~'
+    bat 'git submodule foreach git rev-parse HEAD'
+  }
+}
