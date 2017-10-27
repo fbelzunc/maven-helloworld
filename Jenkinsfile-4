@@ -1,0 +1,80 @@
+properties([
+  buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '1', numToKeepStr: '2'))
+])
+
+stage 'Compile'
+node {
+    checkout scm
+    // use for non multibranch: git 'https://github.com/amuniz/maven-helloworld.git'
+    try {
+      def mvnHome = tool 'maven-3'
+      sh "${mvnHome}/bin/mvn clean install -DskipTests"
+      stash 'working-copy'
+    } catch(e) {
+      currentBuild.result = 'FAILURE'
+      throw e
+    } finally {
+        echo "notify_fixed_or_failed..."
+        notify_fixed_or_failed();
+    }
+}
+
+stage 'Test'
+parallel one: {
+    node {
+        unstash 'working-copy'
+        def mvnHome = tool 'maven-3'
+        sh "${mvnHome}/bin/mvn test -Diterations=10"
+    }
+}, two: {
+    node {
+        unstash 'working-copy'
+        def mvnHome = tool 'maven-3'
+        sh "${mvnHome}/bin/mvn test -Diterations=5"
+    }
+}, failFast: true
+
+
+def notify_fixed_or_failed(String recipients=null) {
+  if (is_fixed()) {
+    echo "sending FIXED email"
+    send_email('FIXED', recipients)
+  } else if (get_status() == 'FAILURE') {
+    echo "sending FAILURE email"
+    send_email('FAILURE', recipients)
+  }
+}
+
+def send_email(String status=null, String recipients=null) {
+
+  status = status ?: get_status()
+  def subject = "${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+
+  def details = """
+  <p>Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+  <p>Check console output at "<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>
+  """
+
+  if (recipients) {
+    System.out.println "Email to recipients"
+    emailext(subject: subject, body: details, to: recipients)
+  } else {
+    recipientsProvider = [
+      [$class: 'CulpritsRecipientProvider'],
+      [$class: 'DevelopersRecipientProvider'],
+      [$class: 'RequesterRecipientProvider']
+    ]
+    emailext(subject: subject, body: details, recipientProviders: recipientsProvider)
+  }
+}
+
+def is_fixed() {
+    def status = get_status()
+    echo status
+    return (status == 'SUCCESS' && !hudson.model.Result.SUCCESS.equals(currentBuild.rawBuild.getPreviousBuild()?.getResult()))
+}
+def get_status() {
+    def status = currentBuild.result ?: 'SUCCESS'
+    currentBuild.result = status
+    return status
+}
