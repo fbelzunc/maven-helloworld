@@ -1,0 +1,29 @@
+def branch = env.JOB_NAME
+
+echo branch
+
+//------------------------------------------------------------------------------
+def jobs = [:]
+
+jobs["windows"] = {
+  node {
+  
+  	stage('Checkout'){
+  		ws(branch){
+  			properties([overrideIndexTriggers(false), pipelineTriggers([[$class: 'TimerTrigger', spec: 'H 16 * * *']])])
+  			echo 'CFD build triggered for Windows'
+  			git "https://github.com/dariver/maven-helloworld.git"
+  		}	
+  	}
+  	stage('Checkmarx Scan')	{
+  		ws(branch){
+        sh "ls -la"
+  		}
+  	}
+  }
+}
+//------------------------------------------------------------------------------
+
+lock(branch){
+	parallel jobs
+}
