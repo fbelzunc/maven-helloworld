@@ -1,29 +1,23 @@
-def branch = env.JOB_NAME
-
-echo branch
-
-//------------------------------------------------------------------------------
-def jobs = [:]
-
-jobs["windows"] = {
-  node {
+node {
+  properties(
+    [[$class: 'BuildBlockerProperty', blockingJobs: '', useBuildBlocker: false], 
+    [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false], 
+    [$class: 'ParametersDefinitionProperty', 
+      parameterDefinitions: [
+        [$class: 'CascadeChoiceParameter', choiceType: 'PT_SINGLE_SELECT', description: 'Select the Build_Label', filterable: true, name: 'Build_Label', randomName: 'choice-parameter-1043374446660973', referencedParameters: '', 
+        script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: true, script: ''], script: [classpath: [], sandbox: false, script: 
+        '''
+          return [\'err 1\', \'err 2\', \'err 3\'] 
+        '''
+        ]
+        ]], 
+        [$class: 'ChoiceParameter', choiceType: 'PT_RADIO', description: 'Select the Environment', filterable: false, name: 'Phase', randomName: 'choice-parameter-1043374447908618', 
+        script: [
+          $class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: true, script: ''], script: [classpath: [], sandbox: true, script: 'return [\'Option 1\', \'Option 2\', \'Option 3\']']]
+        ] 
+      ]
+    ],pipelineTriggers([])]
+  )
   
-  	stage('Checkout'){
-  		ws(branch){
-  			properties([overrideIndexTriggers(false), pipelineTriggers([[$class: 'TimerTrigger', spec: 'H 16 * * *']])])
-  			echo 'CFD build triggered for Windows'
-        checkout scm
-  		}	
-  	}
-  	stage('Checkmarx Scan')	{
-  		ws(branch){
-        sh "ls -la"
-  		}
-  	}
-  }
-}
-//------------------------------------------------------------------------------
-
-lock(branch){
-	parallel jobs
+  sh "echo hello"
 }
