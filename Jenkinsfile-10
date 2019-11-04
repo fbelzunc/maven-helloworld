@@ -19,5 +19,5 @@ node {
     ],pipelineTriggers([])]
   )
   
-  sh "echo hello"
+  sh "echo hello 1"
 }
